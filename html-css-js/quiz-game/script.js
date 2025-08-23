@@ -1,23 +1,23 @@
 // DOM Elements
-// start screen
-const startScreen = document.getElementById("start-screen");
-const startButton = document.getElementById("start-btn");
+// Start screen
+const startScreenEl = document.getElementById("start-screen");
+const startBtnEl = document.getElementById("start-btn");
 
-// quiz screen
-const quizScreen = document.getElementById("quiz-screen");
-const questionText = document.getElementById("question-text");
-const currentQuestionSpan = document.getElementById("current-question");
-const totalQuestionsSpan = document.getElementById("total-questions");
-const scoreSpan = document.getElementById("score");
-const answersContainer = document.getElementById("answers-container");
-const progressBar = document.getElementById("progress");
+// Quiz screen
+const quizScreenEl = document.getElementById("quiz-screen");
+const quizQuestionTextEl = document.getElementById("question-text");
+const quizCurrentQuestionEl = document.getElementById("current-question");
+const quizTotalQuestionsEl = document.getElementById("total-questions");
+const quizScoreEl = document.getElementById("score");
+const quizAnswersContainerEl = document.getElementById("answers-container");
+const quizProgressBarEl = document.getElementById("progress");
 
-// result screen
-const resultScreen = document.getElementById("result-screen");
-const finalScoreSpan = document.getElementById("final-score");
-const maxScoreSpan = document.getElementById("max-score");
-const resultMessage = document.getElementById("result-message");
-const restartButton = document.getElementById("restart-btn");
+// Result screen
+const resultScreenEl = document.getElementById("result-screen");
+const resultFinalScoreEl = document.getElementById("final-score");
+const resultMaxScoreEl = document.getElementById("max-score");
+const resultMessageEl = document.getElementById("result-message");
+const resultRestartBtnEl = document.getElementById("restart-btn");
 
 // Quiz questions
 const quizQuestions = [
@@ -73,22 +73,23 @@ let currentQuestionIndex = 0;
 let score = 0;
 let answersDisablesd = false; // avoid double-clicking the same Q
 
-totalQuestionsSpan.textContent = quizQuestions.length;
-maxScoreSpan.textContent = quizQuestions.length;
+const TOTAL_QUESTIONS = quizQuestions.length;
+quizTotalQuestionsEl.textContent = TOTAL_QUESTIONS;
+resultMaxScoreEl.textContent = TOTAL_QUESTIONS;
 
 // Event listeners
-startButton.addEventListener("click", startQuiz);
-restartButton.addEventListener("click", restartQuiz);
+startBtnEl.addEventListener("click", startQuiz);
+resultRestartBtnEl.addEventListener("click", restartQuiz);
 
 function startQuiz() {
   // change the screen
-  startScreen.classList.remove("active");
-  quizScreen.classList.add("active");
+  startScreenEl.classList.remove("active");
+  quizScreenEl.classList.add("active");
 
   // set the current, total questions count
   currentQuestionIndex = 0;
   score = 0;
-  scoreSpan.textContent = 0;
+  quizScoreEl.textContent = score;
 
   // start quiz (show questions)
   showQuestion();
@@ -96,14 +97,14 @@ function startQuiz() {
 
 function showQuestion() {
   answersDisablesd = false;
-  currentQuestionSpan.textContent = currentQuestionIndex + 1;
+  quizCurrentQuestionEl.textContent = currentQuestionIndex + 1;
   const currentQuestion = quizQuestions[currentQuestionIndex];
 
-  const progressPercent = (currentQuestionIndex / quizQuestions.length) * 100;
-  progressBar.style.width = progressPercent + "%";
+  const progressPercent = (currentQuestionIndex / TOTAL_QUESTIONS) * 100;
+  quizProgressBarEl.style.width = progressPercent + "%";
 
-  questionText.textContent = currentQuestion.question;
-  answersContainer.innerHTML = "";
+  quizQuestionTextEl.textContent = currentQuestion.question;
+  quizAnswersContainerEl.innerHTML = "";
 
   currentQuestion.answers.forEach((answer) => {
     const button = document.createElement("button");
@@ -113,7 +114,7 @@ function showQuestion() {
     button.dataset.correct = answer.correct;
     button.addEventListener("click", selectAnswer);
 
-    answersContainer.appendChild(button);
+    quizAnswersContainerEl.appendChild(button);
   });
 }
 
@@ -127,14 +128,16 @@ function selectAnswer(event) {
 
   if (isCorrect) {
     score++;
-    scoreSpan.textContent = score;
+    quizScoreEl.textContent = score;
   }
 
-  // we can't directly treat 'answersContainer.children' as an array
-  Array.from(answersContainer.children).forEach((button) => {
+  // we can't directly treat 'quizAnswersContainerEl.children' as an array
+  Array.from(quizAnswersContainerEl.children).forEach((button) => {
+    // display the correct answer in both cases (correct/incorrect)
     if (button.dataset.correct === "true") {
       button.classList.add("correct");
     } else if (button === selectedButton) {
+      // only if incorrect answer has been selected
       button.classList.add("incorrect");
     }
   });
@@ -143,7 +146,7 @@ function selectAnswer(event) {
     currentQuestionIndex++;
 
     // is there are more questions in the quiz ?
-    if (currentQuestionIndex < quizQuestions.length) {
+    if (currentQuestionIndex < TOTAL_QUESTIONS) {
       showQuestion();
     } else {
       showResults();
@@ -151,15 +154,14 @@ function selectAnswer(event) {
   }, 1000);
 }
 
-// finalScoreSpan, maxScoreSpan, resultMessage, restartButton
 function showResults() {
   // change the screen
-  quizScreen.classList.remove("active");
-  resultScreen.classList.add("active");
+  quizScreenEl.classList.remove("active");
+  resultScreenEl.classList.add("active");
 
-  finalScoreSpan.textContent = score;
-  const percentage = (score / quizQuestions.length) * 100;
-  resultMessage.textContent = getResultMessage(percentage);
+  resultFinalScoreEl.textContent = score;
+  const percentage = (score / TOTAL_QUESTIONS) * 100;
+  resultMessageEl.textContent = getResultMessage(percentage);
 }
 
 function getResultMessage(percentage) {
@@ -180,7 +182,7 @@ function getResultMessage(percentage) {
 }
 
 function restartQuiz() {
-  resultScreen.classList.remove("active");
+  resultScreenEl.classList.remove("active");
 
   startQuiz();
 }
